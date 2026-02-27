@@ -34,6 +34,7 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from supabase import create_client, Client as SupabaseClient
 
 import cleaner
 import extractor
@@ -57,13 +58,54 @@ _PIPELINE_PORT = int(os.getenv("PIPELINE_PORT", "8000"))
 _JOBS_FILE = Path(__file__).parent / "jobs_data.json"
 _TMP_UPLOAD_PATH = os.path.join(tempfile.gettempdir(), "resume_pipeline_upload.pdf")
 
+# Supabase config — read from .env
+_SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+_SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+
 # ---------------------------------------------------------------------------
 # Module-level state (populated during startup lifespan)
 # ---------------------------------------------------------------------------
 
-_nlp = None          # spacy.language.Language
-_phrase_matcher = None  # spacy.matcher.PhraseMatcher
+_nlp = None
+_phrase_matcher = None
 _local_jobs: list[dict] = []
+
+
+def _fetch_jobs_from_supabase() -> list[dict]:
+    """
+    Fetch all rows from the Supabase ``jobs`` table.
+
+    Queries exactly the columns used by the matching algorithm so the
+    pipeline never pulls more data than it needs.  Returns an empty list
+    (without raising) if credentials are absent or the query fails, so
+    the lifespan can transparently fall back to ``jobs_data.json``.
+
+    Returns:
+        List of job dicts with keys: id, company, job_title, job_function,
+        vacancies, qualification, experience.
+    """
+    if not _SUPABASE_URL or not _SUPABASE_KEY:
+        logger.warning(
+            "SUPABASE_URL or SUPABASE_KEY not set — skipping Supabase fetch."
+        )
+        return []
+
+    try:
+        client: SupabaseClient = create_client(_SUPABASE_URL, _SUPABASE_KEY)
+        response = (
+            client.table("jobs")
+            .select(
+                "id, company, job_title, job_function, "
+                "vacancies, qualification, experience"
+            )
+            .execute()
+        )
+        jobs = response.data or []
+        logger.info("Fetched %d jobs from Supabase.", len(jobs))
+        return jobs
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Failed to fetch jobs from Supabase: %s", exc)
+        return []
 
 
 def get_nlp_state():
@@ -121,14 +163,25 @@ async def lifespan(app: FastAPI):
     _nlp, _phrase_matcher = nlp_pipeline.load_nlp_model()
     logger.info("spaCy model and PhraseMatcher loaded successfully.")
 
-    # Step 3 — local jobs
-    if not _JOBS_FILE.exists():
-        logger.error("jobs_data.json not found at: %s", _JOBS_FILE)
-        _local_jobs = []
+    # Step 3 — load jobs: try Supabase first, fall back to local JSON
+    supabase_jobs = _fetch_jobs_from_supabase()
+    if supabase_jobs:
+        _local_jobs = supabase_jobs
+        logger.info("Using %d jobs from Supabase.", len(_local_jobs))
     else:
-        with _JOBS_FILE.open(encoding="utf-8") as fh:
-            _local_jobs = json.load(fh)
-        logger.info("Loaded %d jobs from %s", len(_local_jobs), _JOBS_FILE)
+        logger.warning(
+            "Supabase unavailable or returned no jobs — "
+            "falling back to jobs_data.json"
+        )
+        if not _JOBS_FILE.exists():
+            logger.error("jobs_data.json not found at: %s", _JOBS_FILE)
+            _local_jobs = []
+        else:
+            with _JOBS_FILE.open(encoding="utf-8") as fh:
+                _local_jobs = json.load(fh)
+            logger.info(
+                "Loaded %d jobs from %s", len(_local_jobs), _JOBS_FILE
+            )
 
     yield  # server runs here
 
@@ -207,37 +260,20 @@ def _err(message: str, status: int) -> JSONResponse:
 
 
 @app.post("/upload-resume", summary="Upload a PDF resume and match against jobs")
-async def upload_resume(file: UploadFile = File(...)) -> JSONResponse:
+async def upload_resume(
+    file: UploadFile = File(...),
+    limit: int = 10,
+) -> JSONResponse:
     """
     Accept a PDF resume, extract profile fields, match against local jobs.
 
-    Processing steps:
+    The pipeline scores ALL loaded jobs (from Supabase) for accuracy, then
+    returns only the top ``limit`` matches ordered by score descending.
+    Each resume produces a different top-N because ranking is unique to the
+    resume's skills, role, and experience.
 
-    1. Validate that the uploaded file is a PDF (``content_type`` check).
-    2. Save the file to ``/tmp/resume_pipeline_upload.pdf``.
-    3. Extract raw text using :func:`extractor.extract_text_from_pdf`.
-    4. Clean and normalise the text using :func:`cleaner.clean_text`.
-    5. Run NLP extraction via :func:`nlp_pipeline.process_resume` to
-       obtain ``extracted_skills``, ``parsed_role``, and
-       ``experience_years``.
-    6. Match the parsed profile against the locally loaded jobs using
-       :func:`matcher.match_resume_to_jobs`.
-    7. Delete the temporary file in a ``finally`` block.
-
-    The ``job_matches`` array in the response maps directly to the
-    ``recommendations`` table: for each item the caller should insert
-    ``(user_id, job_id, final_score)`` into ``recommendations``.
-
-    Args:
-        file: Uploaded file from multipart/form-data field ``"file"``.
-
-    Returns:
-        JSON response with ``resume_profile`` and ``job_matches``.
-
-    Raises:
-        HTTPException 400: If the file is not a PDF, cannot be read,
-                           or yields no extractable text.
-        HTTPException 500: If an unexpected internal error occurs.
+    Query Parameters:
+        limit: Number of top matches to return (default 10, min 1, max 333).
     """
     # Validate content type.
     if file.content_type != "application/pdf":
@@ -278,8 +314,9 @@ async def upload_resume(file: UploadFile = File(...)) -> JSONResponse:
         # NLP extraction.
         resume_data = nlp_pipeline.process_resume(cleaned)
 
-        # Job matching.
-        job_matches = matcher.match_resume_to_jobs(resume_data, _local_jobs)
+        # Score all jobs, then cut to top N.
+        all_matches = matcher.match_resume_to_jobs(resume_data, _local_jobs)
+        top_matches = all_matches[:max(1, limit)]
 
         elapsed_ms = round((time.monotonic() - start_ms) * 1000)
 
@@ -295,8 +332,10 @@ async def upload_resume(file: UploadFile = File(...)) -> JSONResponse:
                             resume_data["extracted_skills"]
                         ),
                     },
-                    "job_matches": job_matches,
+                    "job_matches": top_matches,
                     "total_jobs_analysed": len(_local_jobs),
+                    "matches_returned": len(top_matches),
+                    "limit_applied": limit,
                     "processing_time_ms": elapsed_ms,
                 },
             )
