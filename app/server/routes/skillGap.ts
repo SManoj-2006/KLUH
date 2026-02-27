@@ -1,8 +1,32 @@
 import { Router } from 'express';
 import { authenticateToken, AuthRequest } from '../middleware/auth.js';
-import { db } from '../models/database.js';
+import { createAuthedSupabaseClient, parseSkillsText } from '../lib/supabase.js';
 
 const router = Router();
+
+interface SupabaseJobRow {
+  id: number;
+  company: string | null;
+  job_title: string | null;
+  qualification: string | null;
+}
+
+const getUserSkills = async (accessToken: string, userId: string): Promise<string[]> => {
+  const client = createAuthedSupabaseClient(accessToken);
+  const { data } = await client
+    .from('resumes')
+    .select('extracted_skills')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!Array.isArray(data?.extracted_skills)) {
+    return [];
+  }
+
+  return data.extracted_skills.filter((skill: unknown): skill is string => typeof skill === 'string');
+};
 
 // In-demand skills data
 const inDemandSkills = [
@@ -60,30 +84,41 @@ const trainingRecommendations: Record<string, Array<{
 };
 
 // Get skill gap analysis
-router.get('/', authenticateToken, (req: AuthRequest, res) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const profile = db.getProfile(req.user!.id);
-    const userSkills = profile?.skills.map(s => s.toLowerCase()) || [];
-    
-    const jobs = db.getAllJobs();
+    const client = createAuthedSupabaseClient(req.accessToken!);
+    const userSkills = (await getUserSkills(req.accessToken!, req.user!.id)).map((skill) => skill.toLowerCase());
+    const { data: jobsRows, error } = await client
+      .from('jobs')
+      .select('id, company, job_title, qualification');
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    const jobs = (jobsRows || []) as SupabaseJobRow[];
     
     // Analyze skill gaps for each job
     const jobAnalysis = jobs.map(job => {
-      const jobSkillsLower = job.skills.map(s => s.toLowerCase());
+      const jobSkills = parseSkillsText(job.qualification);
+      const jobSkillsLower = jobSkills.map(s => s.toLowerCase());
       
       // Find matching skills
-      const matchingSkills = job.skills.filter((_, index) => 
+      const matchingSkills = jobSkills.filter((_, index) => 
         userSkills.includes(jobSkillsLower[index])
       );
       
       // Find missing skills
-      const missingSkills = job.skills.filter((_, index) => 
+      const missingSkills = jobSkills.filter((_, index) => 
         !userSkills.includes(jobSkillsLower[index])
       );
       
       // Calculate match percentage
-      const matchPercentage = job.skills.length > 0 
-        ? Math.round((matchingSkills.length / job.skills.length) * 100)
+      const matchPercentage = jobSkills.length > 0 
+        ? Math.round((matchingSkills.length / jobSkills.length) * 100)
         : 0;
 
       // Get training recommendations for missing skills
@@ -92,8 +127,8 @@ router.get('/', authenticateToken, (req: AuthRequest, res) => {
       ).slice(0, 3); // Limit to 3 recommendations
 
       return {
-        jobTitle: job.title,
-        company: job.company,
+        jobTitle: job.job_title || 'Untitled Role',
+        company: job.company || 'Unknown Company',
         overallMatch: matchPercentage,
         matchingSkills,
         missingSkills,
@@ -116,7 +151,7 @@ router.get('/', authenticateToken, (req: AuthRequest, res) => {
       success: true,
       data: {
         analysis: jobAnalysis,
-        userSkills: profile?.skills || [],
+        userSkills,
         totalGaps: jobAnalysis.reduce((sum, job) => sum + job.missingSkills.length, 0)
       }
     });
@@ -130,10 +165,9 @@ router.get('/', authenticateToken, (req: AuthRequest, res) => {
 });
 
 // Get in-demand skills
-router.get('/in-demand', authenticateToken, (req: AuthRequest, res) => {
+router.get('/in-demand', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const profile = db.getProfile(req.user!.id);
-    const userSkills = profile?.skills.map(s => s.toLowerCase()) || [];
+    const userSkills = (await getUserSkills(req.accessToken!, req.user!.id)).map((skill) => skill.toLowerCase());
 
     // Mark skills user already has
     const skillsWithStatus = inDemandSkills.map(skill => ({
@@ -179,22 +213,33 @@ router.get('/training/:skill', authenticateToken, (req: AuthRequest, res) => {
 });
 
 // Get user's skill statistics
-router.get('/stats', authenticateToken, (req: AuthRequest, res) => {
+router.get('/stats', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const profile = db.getProfile(req.user!.id);
-    const userSkills = profile?.skills || [];
-    
-    const jobs = db.getAllJobs();
+    const client = createAuthedSupabaseClient(req.accessToken!);
+    const userSkills = await getUserSkills(req.accessToken!, req.user!.id);
+    const { data: jobsRows, error } = await client
+      .from('jobs')
+      .select('id, qualification');
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    const jobs = (jobsRows || []) as Array<{ id: number; qualification: string | null }>;
     
     // Calculate average match across all jobs
     let totalMatch = 0;
     jobs.forEach(job => {
-      const jobSkillsLower = job.skills.map(s => s.toLowerCase());
-      const matchingSkills = job.skills.filter((_, index) => 
+      const jobSkills = parseSkillsText(job.qualification);
+      const jobSkillsLower = jobSkills.map(s => s.toLowerCase());
+      const matchingSkills = jobSkills.filter((_, index) => 
         userSkills.map(s => s.toLowerCase()).includes(jobSkillsLower[index])
       );
-      const matchPercentage = job.skills.length > 0 
-        ? (matchingSkills.length / job.skills.length) * 100
+      const matchPercentage = jobSkills.length > 0 
+        ? (matchingSkills.length / jobSkills.length) * 100
         : 0;
       totalMatch += matchPercentage;
     });
@@ -203,12 +248,13 @@ router.get('/stats', authenticateToken, (req: AuthRequest, res) => {
 
     // Count job opportunities (jobs with >50% match)
     const opportunities = jobs.filter(job => {
-      const jobSkillsLower = job.skills.map(s => s.toLowerCase());
-      const matchingSkills = job.skills.filter((_, index) => 
+      const jobSkills = parseSkillsText(job.qualification);
+      const jobSkillsLower = jobSkills.map(s => s.toLowerCase());
+      const matchingSkills = jobSkills.filter((_, index) => 
         userSkills.map(s => s.toLowerCase()).includes(jobSkillsLower[index])
       );
-      const matchPercentage = job.skills.length > 0 
-        ? (matchingSkills.length / job.skills.length) * 100
+      const matchPercentage = jobSkills.length > 0 
+        ? (matchingSkills.length / jobSkills.length) * 100
         : 0;
       return matchPercentage >= 50;
     }).length;
