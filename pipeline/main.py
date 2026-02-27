@@ -325,6 +325,9 @@ async def upload_resume(
                 "Resume processed successfully",
                 {
                     "resume_profile": {
+                        "name": resume_data.get("name"),
+                        "email": resume_data.get("email"),
+                        "phone": resume_data.get("phone"),
                         "extracted_skills": resume_data["extracted_skills"],
                         "parsed_role": resume_data["parsed_role"],
                         "experience_years": resume_data["experience_years"],

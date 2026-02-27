@@ -137,9 +137,17 @@ _MONTH_NAMES = (
     r"nov(?:ember)?|dec(?:ember)?)"
 )
 _DATE_RANGE_RE = re.compile(
-    rf"(?:{_MONTH_NAMES}\s+)?(\d{{4}})\s*[-–—to]+\s*"
+    rf"(?:(?:{_MONTH_NAMES})\s+)?(\d{{4}})\s*[-–—to]+\s*"
     rf"(?:(?:{_MONTH_NAMES})\s+)?(\d{{4}}|present|current|till date|now)",
     re.IGNORECASE,
+)
+
+# Email pattern.
+_EMAIL_RE = re.compile(r"[\w\.-]+@[\w\.-]+\.\w+", re.IGNORECASE)
+
+# Phone number pattern (handles international formats, spaces, dashes).
+_PHONE_RE = re.compile(
+    r"(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}",
 )
 
 
@@ -240,6 +248,48 @@ def extract_skills(
 
     logger.debug("Extracted %d skills: %s", len(result), result)
     return result
+
+
+def extract_name(doc: spacy.tokens.Doc) -> str | None:
+    """
+    Extract the person's name using spaCy Named Entity Recognition (PERSON).
+    Takes the first PERSON entity found in the top portion of the resume.
+
+    Args:
+        doc: The parsed spaCy Document.
+    """
+    # Names are usually at the top; only check the first 100 tokens.
+    for ent in doc[:100].ents:
+        if ent.label_ == "PERSON":
+            # Basic cleanup: remove titles and extra whitespace
+            name = ent.text.strip().title()
+            # Ignore false positives like single letters or huge phrases
+            if 2 <= len(name) <= 30 and "\n" not in name:
+                logger.debug("Extracted name: '%s'", name)
+                return name
+    return None
+
+
+def extract_email(text: str) -> str | None:
+    """Extract the first email address found in the text."""
+    match = _EMAIL_RE.search(text)
+    if match:
+        email = match.group(0).lower()
+        logger.debug("Extracted email: '%s'", email)
+        return email
+    return None
+
+
+def extract_phone(text: str) -> str | None:
+    """Extract the first phone number found in the text."""
+    # We only want to search the top of the resume to avoid matching random ID numbers
+    top_text = text[:1000]
+    match = _PHONE_RE.search(top_text)
+    if match:
+        phone = match.group(0).strip()
+        logger.debug("Extracted phone: '%s'", phone)
+        return phone
+    return None
 
 
 def extract_parsed_role(
@@ -391,17 +441,29 @@ def process_resume(cleaned_text: str) -> dict:
 
     doc = nlp(cleaned_text)
 
+    # Basic Contact Info
+    name = extract_name(doc)
+    email = extract_email(cleaned_text)
+    phone = extract_phone(cleaned_text)
+
+    # Professional Profile
     extracted_skills = extract_skills(doc, matcher)
     parsed_role = extract_parsed_role(cleaned_text, nlp)
     experience_years = extract_experience_years(cleaned_text)
 
     result = {
+        "name": name,
+        "email": email,
+        "phone": phone,
         "extracted_skills": extracted_skills,
         "parsed_role": parsed_role,
         "experience_years": experience_years,
     }
     logger.info(
-        "NLP extraction complete. Skills: %d | Role: %s | Experience: %s yr",
+        "NLP extraction complete. Name: %s | Email: %s | Phone: %s | Skills: %d | Role: %s | Exp: %s yr",
+        name,
+        email,
+        phone,
         len(extracted_skills),
         parsed_role,
         experience_years,
