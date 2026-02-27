@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { db } from '../models/database.js';
-import { generateToken, authenticateToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { createAuthedSupabaseClient, supabase } from '../lib/supabase.js';
 const router = Router();
 // Register
 router.post('/register', async (req, res) => {
@@ -19,30 +19,55 @@ router.post('/register', async (req, res) => {
                 message: 'Password must be at least 6 characters'
             });
         }
-        // Check if user exists
-        const existingUser = await db.findUserByEmail(email);
-        if (existingUser) {
-            return res.status(409).json({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: name,
+                    name,
+                },
+            },
+        });
+        if (signUpError) {
+            return res.status(400).json({
                 success: false,
-                message: 'User with this email already exists'
+                message: signUpError.message,
             });
         }
-        // Create user
-        const user = await db.createUser(name, email, password);
-        // Generate token
-        const token = generateToken({
+        let session = signUpData.session;
+        let user = signUpData.user;
+        if (!session) {
+            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+            if (loginError || !loginData.session || !loginData.user) {
+                return res.status(400).json({
+                    success: false,
+                    message: loginError?.message || 'Registration succeeded but automatic login failed',
+                });
+            }
+            session = loginData.session;
+            user = loginData.user;
+        }
+        const authedClient = createAuthedSupabaseClient(session.access_token);
+        const { error: profileError } = await authedClient.from('profiles').upsert({
             id: user.id,
-            email: user.email,
-            name: user.name
-        });
+            full_name: name,
+            email,
+        }, { onConflict: 'id' });
+        if (profileError) {
+            console.error('Profile upsert error:', profileError);
+        }
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
             data: {
-                token,
+                token: session.access_token,
                 user: {
                     id: user.id,
-                    name: user.name,
+                    name,
                     email: user.email
                 }
             }
@@ -67,37 +92,38 @@ router.post('/login', async (req, res) => {
                 message: 'Email and password are required'
             });
         }
-        // Find user
-        const user = await db.findUserByEmail(email);
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-        // Verify password
-        const isValidPassword = await db.verifyPassword(password, user.password);
-        if (!isValidPassword) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-        // Generate token
-        const token = generateToken({
-            id: user.id,
-            email: user.email,
-            name: user.name
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
+        if (error || !data.session || !data.user) {
+            return res.status(401).json({
+                success: false,
+                message: error?.message || 'Invalid email or password'
+            });
+        }
+        const fullName = (typeof data.user.user_metadata?.full_name === 'string' && data.user.user_metadata.full_name) ||
+            (typeof data.user.user_metadata?.name === 'string' && data.user.user_metadata.name) ||
+            data.user.email ||
+            'User';
+        const authedClient = createAuthedSupabaseClient(data.session.access_token);
+        const { error: profileError } = await authedClient.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName,
+            email: data.user.email,
+        }, { onConflict: 'id' });
+        if (profileError) {
+            console.error('Profile upsert error:', profileError);
+        }
         res.json({
             success: true,
             message: 'Login successful',
             data: {
-                token,
+                token: data.session.access_token,
                 user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
+                    id: data.user.id,
+                    name: fullName,
+                    email: data.user.email
                 }
             }
         });
@@ -113,20 +139,13 @@ router.post('/login', async (req, res) => {
 // Get current user
 router.get('/me', authenticateToken, (req, res) => {
     try {
-        const user = db.findUserById(req.user.id);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
         res.json({
             success: true,
             data: {
                 user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
+                    id: req.user.id,
+                    name: req.user.name,
+                    email: req.user.email
                 }
             }
         });

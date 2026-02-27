@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { authenticateToken, AuthRequest } from '../middleware/auth.js';
-import { db } from '../models/database.js';
+import { createAuthedSupabaseClient } from '../lib/supabase.js';
 
 const router = Router();
 
@@ -63,11 +63,6 @@ router.post('/', authenticateToken, upload.single('resume'), async (req: AuthReq
     const userId = req.user!.id;
     const fileUrl = `/uploads/${req.file.filename}`;
 
-    // Update profile with resume URL
-    db.updateProfile(userId, {
-      resumeUrl: fileUrl
-    });
-
     // Simulate AI extraction (in production, this would call an AI service)
     const extractedSkills = ['React', 'TypeScript', 'Node.js', 'Python', 'AWS'];
     const extractedData = {
@@ -78,6 +73,22 @@ router.post('/', authenticateToken, upload.single('resume'), async (req: AuthReq
       experience: '',
       skills: extractedSkills
     };
+
+    const client = createAuthedSupabaseClient(req.accessToken!);
+    const { error } = await client.from('resumes').insert({
+      user_id: userId,
+      file_url: fileUrl,
+      extracted_skills: extractedSkills,
+      parsed_role: null,
+      experience_years: null,
+    });
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
 
     res.json({
       success: true,
@@ -102,25 +113,44 @@ router.post('/', authenticateToken, upload.single('resume'), async (req: AuthReq
 });
 
 // Get upload status
-router.get('/status', authenticateToken, (req: AuthRequest, res) => {
-  const profile = db.getProfile(req.user!.id);
-  
+router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
+  const client = createAuthedSupabaseClient(req.accessToken!);
+  const { data, error } = await client
+    .from('resumes')
+    .select('file_url')
+    .eq('user_id', req.user!.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
   res.json({
     success: true,
     data: {
-      hasResume: !!profile?.resumeUrl,
-      resumeUrl: profile?.resumeUrl
+      hasResume: !!data?.file_url,
+      resumeUrl: data?.file_url || null
     }
   });
 });
 
 // Delete resume
-router.delete('/', authenticateToken, (req: AuthRequest, res) => {
-  const profile = db.getProfile(req.user!.id);
-  
-  if (profile) {
-    db.updateProfile(req.user!.id, {
-      resumeUrl: undefined
+router.delete('/', authenticateToken, async (req: AuthRequest, res) => {
+  const client = createAuthedSupabaseClient(req.accessToken!);
+  const { error } = await client
+    .from('resumes')
+    .delete()
+    .eq('user_id', req.user!.id);
+
+  if (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 
