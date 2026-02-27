@@ -1,0 +1,75 @@
+Python
+Java
+JavaScript
+TypeScript
+C++
+C
+Go
+Rust
+Swift
+Kotlin
+React
+Angular
+Vue
+Node.js
+Express
+Django
+Flask
+FastAPI
+Spring Boot
+SQL
+MySQL
+PostgreSQL
+MongoDB
+SQLite
+Redis
+Firebase
+AWS
+Azure
+GCP
+Docker
+Kubernetes
+Git
+Linux
+Bash
+TensorFlow
+PyTorch
+scikit-learn
+Pandas
+NumPy
+Matplotlib
+REST API
+GraphQL
+Microservices
+CI/CD
+Jenkins
+GitHub Actions
+Tally ERP
+SAP
+AutoCAD
+CATIA
+STAAD Pro
+ANSYS
+Revit
+MATLAB
+LabVIEW
+PLC Programming
+Embedded Systems
+Arduino
+Core Java
+Selenium
+Appium
+Postman
+Figma
+Canva
+Power BI
+Tableau
+Advanced Excel
+MS Office
+Communication
+Leadership
+Teamwork
+Problem Solving
+Project Management
+Time Management
+Critical Thinking

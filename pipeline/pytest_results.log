@@ -1,0 +1,536 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\kksam\Desktop\KLUH\pipeline\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\kksam\Desktop\KLUH\pipeline
+plugins: anyio-4.12.1
+collecting ... collected 152 items
+
+tests/test_api.py::TestHealthEndpoint::test_returns_200 PASSED           [  0%]
+tests/test_api.py::TestHealthEndpoint::test_success_true PASSED          [  1%]
+tests/test_api.py::TestHealthEndpoint::test_status_healthy PASSED        [  1%]
+tests/test_api.py::TestHealthEndpoint::test_spacy_model_name PASSED      [  2%]
+tests/test_api.py::TestHealthEndpoint::test_jobs_loaded_count PASSED     [  3%]
+tests/test_api.py::TestHealthEndpoint::test_matching_factors_keys PASSED [  3%]
+tests/test_api.py::TestHealthEndpoint::test_matching_factors_mention_weights PASSED [  4%]
+tests/test_api.py::TestJobsEndpoint::test_returns_200 PASSED             [  5%]
+tests/test_api.py::TestJobsEndpoint::test_success_true PASSED            [  5%]
+tests/test_api.py::TestJobsEndpoint::test_total_is_10 PASSED             [  6%]
+tests/test_api.py::TestJobsEndpoint::test_jobs_is_list PASSED            [  7%]
+tests/test_api.py::TestJobsEndpoint::test_jobs_schema_fields_present PASSED [  7%]
+tests/test_api.py::TestJobsEndpoint::test_no_extra_fields_in_jobs PASSED [  8%]
+tests/test_api.py::TestJobsEndpoint::test_job_ids_are_integers PASSED    [  9%]
+tests/test_api.py::TestMatchJobsEndpoint::test_returns_200 PASSED        [  9%]
+tests/test_api.py::TestMatchJobsEndpoint::test_success_true PASSED       [ 10%]
+tests/test_api.py::TestMatchJobsEndpoint::test_job_matches_length PASSED [ 11%]
+tests/test_api.py::TestMatchJobsEndpoint::test_job_matches_sorted_by_score PASSED [ 11%]
+tests/test_api.py::TestMatchJobsEndpoint::test_python_job_ranks_first PASSED [ 12%]
+tests/test_api.py::TestMatchJobsEndpoint::test_match_result_keys PASSED  [ 13%]
+tests/test_api.py::TestMatchJobsEndpoint::test_scores_are_floats PASSED  [ 13%]
+tests/test_api.py::TestMatchJobsEndpoint::test_scores_in_valid_range PASSED [ 14%]
+tests/test_api.py::TestMatchJobsEndpoint::test_empty_jobs_list_returns_empty_matches PASSED [ 15%]
+tests/test_api.py::TestMatchJobsEndpoint::test_none_parsed_role PASSED   [ 15%]
+tests/test_api.py::TestMatchJobsEndpoint::test_none_experience_years_neutral PASSED [ 16%]
+tests/test_api.py::TestMatchJobsEndpoint::test_invalid_body_returns_422 PASSED [ 17%]
+tests/test_api.py::TestMatchJobsEndpoint::test_total_jobs_analysed_field PASSED [ 17%]
+tests/test_api.py::TestMatchJobsEndpoint::test_processing_time_ms_present PASSED [ 18%]
+tests/test_api.py::TestMatchJobsEndpoint::test_matched_skills_subset_of_extracted PASSED [ 19%]
+tests/test_api.py::TestMatchJobsEndpoint::test_fresher_job_experience_score PASSED [ 19%]
+tests/test_api.py::TestUploadResumeEndpoint::test_rejects_non_pdf PASSED [ 20%]
+tests/test_api.py::TestUploadResumeEndpoint::test_rejects_docx_as_pdf PASSED [ 21%]
+tests/test_api.py::TestUploadResumeEndpoint::test_valid_pdf_returns_200 FAILED [ 21%]
+tests/test_api.py::TestUploadResumeEndpoint::test_valid_pdf_success_true FAILED [ 22%]
+tests/test_api.py::TestUploadResumeEndpoint::test_response_has_resume_profile FAILED [ 23%]
+tests/test_api.py::TestUploadResumeEndpoint::test_extracted_skills_is_list FAILED [ 23%]
+tests/test_api.py::TestUploadResumeEndpoint::test_python_resume_extracts_python_skill FAILED [ 24%]
+tests/test_api.py::TestUploadResumeEndpoint::test_total_skills_found_matches_list_length FAILED [ 25%]
+tests/test_api.py::TestUploadResumeEndpoint::test_response_has_job_matches FAILED [ 25%]
+tests/test_api.py::TestUploadResumeEndpoint::test_total_jobs_analysed_is_10 FAILED [ 26%]
+tests/test_api.py::TestUploadResumeEndpoint::test_job_matches_ranked FAILED [ 26%]
+tests/test_api.py::TestUploadResumeEndpoint::test_python_resume_gets_software_job_rank1 FAILED [ 27%]
+tests/test_api.py::TestUploadResumeEndpoint::test_fresher_resume_matches_fresher_job_high FAILED [ 28%]
+tests/test_api.py::TestUploadResumeEndpoint::test_mechanical_resume_matches_mechanical_job_rank1 FAILED [ 28%]
+tests/test_api.py::TestUploadResumeEndpoint::test_processing_time_ms_is_positive FAILED [ 29%]
+tests/test_api.py::TestUploadResumeEndpoint::test_qualification_in_output_but_not_in_scoring FAILED [ 30%]
+tests/test_cleaner.py::TestCleanTextNormal::test_basic_cleanup PASSED    [ 30%]
+tests/test_cleaner.py::TestCleanTextNormal::test_newlines_replaced_by_space PASSED [ 31%]
+tests/test_cleaner.py::TestCleanTextNormal::test_carriage_returns_removed PASSED [ 32%]
+tests/test_cleaner.py::TestCleanTextNormal::test_multiple_spaces_collapsed PASSED [ 32%]
+tests/test_cleaner.py::TestCleanTextNormal::test_lowercasing PASSED      [ 33%]
+tests/test_cleaner.py::TestCleanTextNormal::test_non_ascii_stripped PASSED [ 34%]
+tests/test_cleaner.py::TestCleanTextNormal::test_standard_punctuation_preserved PASSED [ 34%]
+tests/test_cleaner.py::TestCleanTextNormal::test_tabs_collapsed PASSED   [ 35%]
+tests/test_cleaner.py::TestCleanTextNormal::test_leading_trailing_whitespace_stripped PASSED [ 36%]
+tests/test_cleaner.py::TestCleanTextEdgeCases::test_already_clean_text PASSED [ 36%]
+tests/test_cleaner.py::TestCleanTextEdgeCases::test_single_word PASSED   [ 37%]
+tests/test_cleaner.py::TestCleanTextEdgeCases::test_unicode_letters_stripped PASSED [ 38%]
+tests/test_cleaner.py::TestCleanTextErrors::test_empty_string_raises_value_error PASSED [ 38%]
+tests/test_cleaner.py::TestCleanTextErrors::test_none_raises_value_error PASSED [ 39%]
+tests/test_cleaner.py::TestCleanTextErrors::test_whitespace_only_raises_value_error PASSED [ 40%]
+tests/test_matcher.py::TestCalculateSkillScore::test_perfect_match PASSED [ 40%]
+tests/test_matcher.py::TestCalculateSkillScore::test_partial_match PASSED [ 41%]
+tests/test_matcher.py::TestCalculateSkillScore::test_no_match PASSED     [ 42%]
+tests/test_matcher.py::TestCalculateSkillScore::test_case_insensitive PASSED [ 42%]
+tests/test_matcher.py::TestCalculateSkillScore::test_empty_skills_returns_zero PASSED [ 43%]
+tests/test_matcher.py::TestCalculateSkillScore::test_empty_job_function_returns_zero PASSED [ 44%]
+tests/test_matcher.py::TestCalculateSkillScore::test_score_clamped_at_one PASSED [ 44%]
+tests/test_matcher.py::TestCalculateSkillScore::test_single_token_job_function PASSED [ 45%]
+tests/test_matcher.py::TestCalculateSkillScore::test_whitespace_trimmed_in_tokens PASSED [ 46%]
+tests/test_matcher.py::TestCalculateRoleScore::test_spec_example PASSED  [ 46%]
+tests/test_matcher.py::TestCalculateRoleScore::test_full_match PASSED    [ 47%]
+tests/test_matcher.py::TestCalculateRoleScore::test_none_parsed_role_returns_zero PASSED [ 48%]
+tests/test_matcher.py::TestCalculateRoleScore::test_empty_parsed_role_returns_zero PASSED [ 48%]
+tests/test_matcher.py::TestCalculateRoleScore::test_stop_words_are_removed PASSED [ 49%]
+tests/test_matcher.py::TestCalculateRoleScore::test_case_insensitive PASSED [ 50%]
+tests/test_matcher.py::TestCalculateRoleScore::test_no_overlap_returns_zero PASSED [ 50%]
+tests/test_matcher.py::TestCalculateRoleScore::test_data_analyst PASSED  [ 51%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_a_within_range PASSED [ 51%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_a_at_lower_bound PASSED [ 52%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_a_at_upper_bound PASSED [ 53%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_a_below_range_penalised PASSED [ 53%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_a_above_range_penalised PASSED [ 54%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_a_far_below_clamps_to_zero PASSED [ 55%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_b_above_minimum PASSED [ 55%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_b_exactly_minimum PASSED [ 56%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_b_below_minimum PASSED [ 57%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_c_fresher_zero_years PASSED [ 57%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_c_fresher_one_year PASSED [ 58%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_c_fresher_two_years PASSED [ 59%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_c_entry_level PASSED [ 59%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_c_overqualified_clamped PASSED [ 60%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_d_unparseable_returns_neutral PASSED [ 61%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_rule_d_empty_string_neutral PASSED [ 61%]
+tests/test_matcher.py::TestCalculateExperienceScore::test_none_experience_years_returns_neutral PASSED [ 62%]
+tests/test_matcher.py::TestCalculateFinalScore::test_spec_example PASSED [ 63%]
+tests/test_matcher.py::TestCalculateFinalScore::test_all_zero PASSED     [ 63%]
+tests/test_matcher.py::TestCalculateFinalScore::test_all_perfect PASSED  [ 64%]
+tests/test_matcher.py::TestCalculateFinalScore::test_weights_correct PASSED [ 65%]
+tests/test_matcher.py::TestCalculateFinalScore::test_rounding PASSED     [ 65%]
+tests/test_matcher.py::TestGetMatchLabel::test_excellent PASSED          [ 66%]
+tests/test_matcher.py::TestGetMatchLabel::test_good PASSED               [ 67%]
+tests/test_matcher.py::TestGetMatchLabel::test_partial PASSED            [ 67%]
+tests/test_matcher.py::TestGetMatchLabel::test_low PASSED                [ 68%]
+tests/test_matcher.py::TestGetMatchLabel::test_boundary_80 PASSED        [ 69%]
+tests/test_matcher.py::TestGetMatchLabel::test_boundary_60 PASSED        [ 69%]
+tests/test_matcher.py::TestGetMatchLabel::test_boundary_40 PASSED        [ 70%]
+tests/test_matcher.py::TestMatchedMissingSkills::test_matched_skills_case_insensitive PASSED [ 71%]
+tests/test_matcher.py::TestMatchedMissingSkills::test_missing_skills_returns_tokens_not_in_resume PASSED [ 71%]
+tests/test_matcher.py::TestMatchedMissingSkills::test_no_matched_skills PASSED [ 72%]
+tests/test_matcher.py::TestMatchedMissingSkills::test_all_skills_matched PASSED [ 73%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_returns_all_jobs_ranked PASSED [ 73%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_sorted_by_final_score_descending PASSED [ 74%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_ranks_assigned_correctly PASSED [ 75%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_python_job_ranks_first PASSED [ 75%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_output_keys_complete PASSED [ 76%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_qualification_present_but_not_scored PASSED [ 76%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_score_values_are_floats PASSED [ 77%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_score_in_valid_range PASSED [ 78%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_empty_jobs_list PASSED [ 78%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_none_parsed_role PASSED [ 79%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_none_experience_years_neutral PASSED [ 80%]
+tests/test_matcher.py::TestMatchResumeToJobs::test_fresher_profile_vs_fresher_job PASSED [ 80%]
+tests/test_nlp_pipeline.py::TestLoadNlpModel::test_returns_tuple PASSED  [ 81%]
+tests/test_nlp_pipeline.py::TestLoadNlpModel::test_nlp_is_spacy_language PASSED [ 82%]
+tests/test_nlp_pipeline.py::TestLoadNlpModel::test_matcher_has_skill_map FAILED [ 82%]
+tests/test_nlp_pipeline.py::TestLoadNlpModel::test_known_skills_in_matcher FAILED [ 83%]
+tests/test_nlp_pipeline.py::TestLoadNlpModel::test_original_casing_preserved FAILED [ 84%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_extracts_known_skills PASSED [ 84%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_case_insensitive_extraction PASSED [ 85%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_returns_original_casing_from_skills_list PASSED [ 86%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_deduplication PASSED [ 86%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_no_skills_in_text PASSED [ 87%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_returns_list PASSED  [ 88%]
+tests/test_nlp_pipeline.py::TestExtractSkills::test_multi_word_skills PASSED [ 88%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_detects_role_near_objective PASSED [ 89%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_detects_role_full_text_scan PASSED [ 90%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_detects_data_analyst PASSED [ 90%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_returns_none_when_no_role_found PASSED [ 91%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_returns_string_or_none PASSED [ 92%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_mechanical_engineer_detected PASSED [ 92%]
+tests/test_nlp_pipeline.py::TestExtractParsedRole::test_qa_engineer_detected PASSED [ 93%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_explicit_years_of_experience PASSED [ 94%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_explicit_yrs_shorthand PASSED [ 94%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_explicit_plus_years PASSED [ 95%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_explicit_experience_of_n_years PASSED [ 96%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_date_range_simple_years PASSED [ 96%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_date_range_present PASSED [ 97%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_date_range_multiple_jobs PASSED [ 98%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_no_experience_mentioned_returns_none PASSED [ 98%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_returns_int_or_none PASSED [ 99%]
+tests/test_nlp_pipeline.py::TestExtractExperienceYears::test_zero_should_not_be_returned_by_date_ranges PASSED [100%]
+
+================================== FAILURES ===================================
+_____________ TestUploadResumeEndpoint.test_valid_pdf_returns_200 _____________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F88712C40>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_valid_pdf_returns_200(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       assert response.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests\test_api.py:330: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+____________ TestUploadResumeEndpoint.test_valid_pdf_success_true _____________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F88713490>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_valid_pdf_success_true(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       assert response.json()["success"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'success'
+
+tests\test_api.py:338: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+__________ TestUploadResumeEndpoint.test_response_has_resume_profile __________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F88822D50>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_response_has_resume_profile(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       data = response.json()["data"]
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:346: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+___________ TestUploadResumeEndpoint.test_extracted_skills_is_list ____________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F8878E690>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_extracted_skills_is_list(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       profile = response.json()["data"]["resume_profile"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:360: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+______ TestUploadResumeEndpoint.test_python_resume_extracts_python_skill ______
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F8878E7A0>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_python_resume_extracts_python_skill(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       profile = response.json()["data"]["resume_profile"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:369: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+____ TestUploadResumeEndpoint.test_total_skills_found_matches_list_length _____
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F887B1A50>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_total_skills_found_matches_list_length(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       profile = response.json()["data"]["resume_profile"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:379: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+___________ TestUploadResumeEndpoint.test_response_has_job_matches ____________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F887B1B50>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_response_has_job_matches(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       data = response.json()["data"]
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:388: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+___________ TestUploadResumeEndpoint.test_total_jobs_analysed_is_10 ___________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F887BDF40>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_total_jobs_analysed_is_10(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       assert response.json()["data"]["total_jobs_analysed"] == 10
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:398: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+______________ TestUploadResumeEndpoint.test_job_matches_ranked _______________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F887BE030>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_job_matches_ranked(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       matches = response.json()["data"]["job_matches"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:406: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+_____ TestUploadResumeEndpoint.test_python_resume_gets_software_job_rank1 _____
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F8882B5B0>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_python_resume_gets_software_job_rank1(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       top_match = response.json()["data"]["job_matches"][0]
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:416: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+____ TestUploadResumeEndpoint.test_fresher_resume_matches_fresher_job_high ____
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F8882B930>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_fresher_resume_matches_fresher_job_high(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(FRESHER_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       matches = response.json()["data"]["job_matches"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:426: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+_ TestUploadResumeEndpoint.test_mechanical_resume_matches_mechanical_job_rank1 _
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F887A32B0>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_mechanical_resume_matches_mechanical_job_rank1(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(MECHANICAL_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       matches = response.json()["data"]["job_matches"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:438: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+________ TestUploadResumeEndpoint.test_processing_time_ms_is_positive _________
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F887516D0>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_processing_time_ms_is_positive(self, api_client: TestClient):
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       t = response.json()["data"]["processing_time_ms"]
+            ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:449: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+__ TestUploadResumeEndpoint.test_qualification_in_output_but_not_in_scoring ___
+
+self = <test_api.TestUploadResumeEndpoint object at 0x0000026F88751850>
+api_client = <starlette.testclient.TestClient object at 0x0000026FA9E2B8C0>
+
+    def test_qualification_in_output_but_not_in_scoring(self, api_client: TestClient):
+        """Qualification appears in output as informational only."""
+        pdf_bytes = make_pdf_bytes(PYTHON_BACKEND_RESUME_TEXT)
+        response = api_client.post(
+            "/upload-resume",
+            files={"file": ("resume.pdf", io.BytesIO(pdf_bytes), "application/pdf")},
+        )
+>       matches = response.json()["data"]["job_matches"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'data'
+
+tests\test_api.py:460: KeyError
+------------------------------ Captured log call ------------------------------
+ERROR    main:main.py:305 Unexpected error in /upload-resume: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+Traceback (most recent call last):
+  File "C:\Users\kksam\Desktop\KLUH\pipeline\main.py", line 254, in upload_resume
+    with open(tmp_path, "wb") as fh:
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/resume_pipeline_upload.pdf'
+_________________ TestLoadNlpModel.test_matcher_has_skill_map _________________
+
+self = <test_nlp_pipeline.TestLoadNlpModel object at 0x0000026FA9DE4E90>
+matcher = <spacy.matcher.phrasematcher.PhraseMatcher object at 0x0000026F888835A0>
+
+    def test_matcher_has_skill_map(self, matcher):
+>       skill_map = matcher.__dict__.get("_skill_map", {})
+                    ^^^^^^^^^^^^^^^^
+E       AttributeError: 'spacy.matcher.phrasematcher.PhraseMatcher' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+tests\test_nlp_pipeline.py:59: AttributeError
+________________ TestLoadNlpModel.test_known_skills_in_matcher ________________
+
+self = <test_nlp_pipeline.TestLoadNlpModel object at 0x0000026FA9DE4D60>
+matcher = <spacy.matcher.phrasematcher.PhraseMatcher object at 0x0000026F888835A0>
+
+    def test_known_skills_in_matcher(self, matcher):
+>       skill_map = matcher.__dict__.get("_skill_map", {})
+                    ^^^^^^^^^^^^^^^^
+E       AttributeError: 'spacy.matcher.phrasematcher.PhraseMatcher' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+tests\test_nlp_pipeline.py:64: AttributeError
+_______________ TestLoadNlpModel.test_original_casing_preserved _______________
+
+self = <test_nlp_pipeline.TestLoadNlpModel object at 0x0000026FA9DBB2F0>
+matcher = <spacy.matcher.phrasematcher.PhraseMatcher object at 0x0000026F888835A0>
+
+    def test_original_casing_preserved(self, matcher):
+>       skill_map = matcher.__dict__.get("_skill_map", {})
+                    ^^^^^^^^^^^^^^^^
+E       AttributeError: 'spacy.matcher.phrasematcher.PhraseMatcher' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+tests\test_nlp_pipeline.py:70: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_valid_pdf_returns_200
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_valid_pdf_success_true
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_response_has_resume_profile
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_extracted_skills_is_list
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_python_resume_extracts_python_skill
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_total_skills_found_matches_list_length
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_response_has_job_matches
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_total_jobs_analysed_is_10
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_job_matches_ranked
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_python_resume_gets_software_job_rank1
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_fresher_resume_matches_fresher_job_high
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_mechanical_resume_matches_mechanical_job_rank1
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_processing_time_ms_is_positive
+FAILED tests/test_api.py::TestUploadResumeEndpoint::test_qualification_in_output_but_not_in_scoring
+FAILED tests/test_nlp_pipeline.py::TestLoadNlpModel::test_matcher_has_skill_map
+FAILED tests/test_nlp_pipeline.py::TestLoadNlpModel::test_known_skills_in_matcher
+FAILED tests/test_nlp_pipeline.py::TestLoadNlpModel::test_original_casing_preserved
+======================= 17 failed, 135 passed in 1.51s ========================
